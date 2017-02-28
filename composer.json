@@ -1,0 +1,28 @@
+{
+    "name": "acelot/resolver",
+    "description": "Dependency auto resolver for PHP 7",
+    "keywords": ["dependency injection", "resolver", "inversion of control"],
+    "type": "library",
+    "homepage": "https://github.com/acelot/resolver",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Valeriy Protopopov",
+            "email": "provaleriy@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acelot\\Resolver\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    }
+}
