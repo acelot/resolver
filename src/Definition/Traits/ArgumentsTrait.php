@@ -10,34 +10,43 @@ trait ArgumentsTrait
     protected $args = [];
 
     /**
-     * @param string $name
+     * Checks whether the argument exists.
+     *
+     * @param string $name Argument name
+     *
      * @return bool
      */
-    public function hasArg(string $name): bool
+    public function hasArgument(string $name): bool
     {
         return array_key_exists($name, $this->args);
     }
 
     /**
-     * @param string $name
+     * Returns the argument value.
+     *
+     * @param string $name Argument name
+     *
      * @return mixed
      * @throws \OutOfBoundsException
      */
-    public function getArg(string $name)
+    public function getArgument(string $name)
     {
-        if (!$this->hasArg($name)) {
-            throw new \OutOfBoundsException();
+        if (!$this->hasArgument($name)) {
+            throw new \OutOfBoundsException(sprintf('The argument "%s" is not exists', $name));
         }
 
         return $this->args[$name];
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * Returns the new instance of the trait holding class with new argument.
+     *
+     * @param string $name  Argument name
+     * @param mixed  $value Argument value
+     *
      * @return static
      */
-    public function withArg(string $name, $value)
+    public function withArgument(string $name, $value)
     {
         $clone = clone $this;
         $clone->args[$name] = $value;

@@ -17,8 +17,11 @@ class CallbackDefinition implements DefinitionInterface
     protected $callback;
 
     /**
-     * @param callable $callback
-     * @return static
+     * Creates the definition with given callback function.
+     *
+     * @param callable $callback Callback function
+     *
+     * @return CallbackDefinition
      */
     public static function define(callable $callback): CallbackDefinition
     {
@@ -26,7 +29,7 @@ class CallbackDefinition implements DefinitionInterface
     }
 
     /**
-     * @param callable $callback
+     * @param callable $callback Callback function
      */
     private function __construct(callable $callback)
     {
@@ -34,7 +37,9 @@ class CallbackDefinition implements DefinitionInterface
     }
 
     /**
-     * @return callable
+     * Returns the callback function.
+     *
+     * @return callable Callback function
      */
     public function getCallback(): callable
     {
@@ -42,7 +47,10 @@ class CallbackDefinition implements DefinitionInterface
     }
 
     /**
+     * Resolves and invoke the callback function.
+     *
      * @param ResolverInterface $resolver
+     *
      * @return object
      * @throws ResolverException
      */
@@ -52,8 +60,8 @@ class CallbackDefinition implements DefinitionInterface
         $args = [];
 
         foreach ($ref->getParameters() as $param) {
-            if ($this->hasArg($param->getName())) {
-                $args[] = $this->getArg($param->getName());
+            if ($this->hasArgument($param->getName())) {
+                $args[] = $this->getArgument($param->getName());
                 continue;
             }
 
@@ -68,9 +76,7 @@ class CallbackDefinition implements DefinitionInterface
                 continue;
             }
 
-            throw new ResolverException(
-                sprintf('Cannot resolve the callback "%s"', $ref->getName())
-            );
+            throw new ResolverException(sprintf('Cannot resolve the callback "%s"', $ref->getName()));
         }
 
         return $ref->invokeArgs($args);

@@ -1,12 +1,39 @@
 # Resolver
 
-Resolver is a dependency auto resolver for PHP 7.
+**Resolver** is a dependency auto resolver for PHP 7.
 
-## Usage
+### Installation
 
-1. Create factories
+```
+composer require acelot/resolver
+```
 
-`LoggerFactory.php`
+### How it works?
+
+**Resolver** resolves the classes by using [Reflection](http://php.net/manual/ru/book.reflection.php). Through reflection the **Resolver** finds out all dependencies of the class and all dependencies of dependencies and so on. When **Resolver** reaches the deepest dependency it starts creating instances of these one by one until the top class. The resolved classes are stored in local array to avoid re-resolving.
+
+### But Reflection is too slow for production?
+
+**Resolver** can use any [PSR-16](http://www.php-fig.org/psr/psr-16/) compatible cache providers through `useCache(CacheInterface $cache)` method. For example, [matthiasmullie/scrapbook](https://github.com/matthiasmullie/scrapbook):
+
+```php
+$client = new \Memcached();
+$client->addServer('localhost', 11211);
+$cache = new \MatthiasMullie\Scrapbook\Adapters\Memcached($client);
+
+$resolver = new Resolver();
+$resolver->useCache($cache);
+```
+
+### Available definitions
+
+- CallbackDefinition
+- ClassDefinition
+- ValueDefinition
+
+### Example
+
+**Logger Factory** `LoggerFactory.php`
 
 ```php
 namespace Acme;
@@ -26,7 +53,7 @@ class LoggerFactory
 }
 ```
 
-`MongoDbFactory.php`
+**Database Factory** `MongoDbFactory.php`
 
 ```php
 namespace Acme;
@@ -46,9 +73,7 @@ class LoggerFactory
 }
 ```
 
-2. Some repositories
-
-`Respository.php`
+**Repository** `Respository.php`
 
 ```php
 namespace Acme;
@@ -78,11 +103,6 @@ class Repository implements SomeRepositoryInterface
         return new Database($config->get('mongodb.uri'));
     }
     
-    /**
-     * @param int $id
-     * @return array
-     * @throws RepositoryException
-     */
     public function get(int $id): array
     {
         try {
@@ -92,38 +112,17 @@ class Repository implements SomeRepositoryInterface
             throw new RepositoryException();
         }
     }
-    
-    /**
-     * @param array $data
-     * @return array
-     * @throws RepositoryException
-     */
+
     public function create(array $data): array
     {
         // ...
     }
-    
-    /**
-     * @param int $id
-     * @return array $data
-     * @throws RepositoryException
-     */
+
     public function update(int $id, array $data): array
     {
-        $this->logger->debug('Updating document...');
-        
-        try {
-            return $this->db->updateOne(['_id' => $id], $data)->toArray();
-        } catch (MongoDbException $e) {
-            $this->logger->error('Error occurred while updating the document!');
-            throw new RepositoryException();
-        }
+        // ...
     }
-    
-    /**
-     * @param int $id
-     * @throws RepositoryException
-     */
+
     public function delete(int $id): void
     {
         // ...
@@ -131,9 +130,7 @@ class Repository implements SomeRepositoryInterface
 }
 ```
 
-3. Resolve dependecies automatically
-
-`index.php`
+**App** `index.php`
 
 ```php
 namespace Acme;

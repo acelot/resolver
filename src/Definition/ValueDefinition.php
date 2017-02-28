@@ -13,17 +13,21 @@ class ValueDefinition implements DefinitionInterface
     protected $value;
 
     /**
-     * @param object $value
-     * @return static
+     * Creates the definition with given value.
+     *
+     * @param object $value Object value
+     *
+     * @return ValueDefinition
      * @throws \InvalidArgumentException
      */
-    public static function define($value)
+    public static function define($value): ValueDefinition
     {
-        return new static($value);
+        return new ValueDefinition($value);
     }
 
     /**
      * @param object $value
+     *
      * @throws \InvalidArgumentException
      */
     private function __construct($value)
@@ -36,6 +40,8 @@ class ValueDefinition implements DefinitionInterface
     }
 
     /**
+     * Returns the value.
+     *
      * @return object
      */
     public function getValue()
@@ -44,7 +50,10 @@ class ValueDefinition implements DefinitionInterface
     }
 
     /**
+     * Returns the value.
+     *
      * @param ResolverInterface $resolver
+     *
      * @return object
      */
     public function resolve(ResolverInterface $resolver)

@@ -2,6 +2,9 @@
 
 namespace Acelot\Resolver\Exception;
 
+/**
+ * The general exception thrown by Resolver.
+ */
 class ResolverException extends \Exception
 {
 }

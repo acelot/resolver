@@ -6,6 +6,7 @@ use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class ClassDefinition implements DefinitionInterface
 {
@@ -22,8 +23,11 @@ class ClassDefinition implements DefinitionInterface
     protected $factoryMethod;
 
     /**
-     * @param string $class
-     * @return static
+     * Creates the definition with given class name.
+     *
+     * @param string $fqcn Fully qualified class name
+     *
+     * @return ClassDefinition
      */
     public static function define(string $fqcn): ClassDefinition
     {
@@ -31,14 +35,16 @@ class ClassDefinition implements DefinitionInterface
     }
 
     /**
-     * @param string $class
+     * @param string $fqcn Fully qualified class name
      */
-    private function __construct(string $class)
+    private function __construct(string $fqcn)
     {
-        $this->fqcn = $class;
+        $this->fqcn = $fqcn;
     }
 
     /**
+     * Returns the fully qualified class name.
+     *
      * @return string
      */
     public function getFqcn(): string
@@ -47,6 +53,8 @@ class ClassDefinition implements DefinitionInterface
     }
 
     /**
+     * Returns the factory method name.
+     *
      * @return null|string
      */
     public function getFactoryMethod(): ?string
@@ -55,8 +63,10 @@ class ClassDefinition implements DefinitionInterface
     }
 
     /**
-     * @param null|string $name
-     * @param mixed $value
+     * Returns the new instance of the definition with new factory method.
+     *
+     * @param null|string $method Factory method name
+     *
      * @return ClassDefinition
      */
     public function withFactoryMethod(?string $method): ClassDefinition
@@ -68,11 +78,14 @@ class ClassDefinition implements DefinitionInterface
     }
 
     /**
+     * Resolves and returns the instance of the class.
+     *
      * @param ResolverInterface $resolver
+     *
      * @return object
      * @throws ResolverException
      */
-    public function resolve(ResolverInterface $resolver)
+    public function resolve(ResolverInterface $resolver, CacheInterface $cache)
     {
         $ref = new \ReflectionClass($this->getFqcn());
         $factoryMethod = $this->getFactoryMethod();
@@ -89,8 +102,8 @@ class ClassDefinition implements DefinitionInterface
         $args = [];
 
         foreach ($factory->getParameters() as $param) {
-            if ($this->hasArg($param->getName())) {
-                $args[] = $this->getArg($param->getName());
+            if ($this->hasArgument($param->getName())) {
+                $args[] = $this->getArgument($param->getName());
                 continue;
             }
 

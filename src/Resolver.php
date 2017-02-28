@@ -3,8 +3,16 @@
 namespace Acelot\Resolver;
 
 use Psr\SimpleCache\CacheInterface;
-use Acelot\Resolver\Definition\ClassDefinition;
 
+/**
+ * @example
+ *
+ *   $resolver = new Resolver([
+ *       LoggerInterface::class => ClassDefinition::define(MonologLoggerFactory::class),
+ *       Database::class => ClassDefinition::define(MongoDbFactory::class)
+ *   ]);
+ *
+ */
 class Resolver implements ResolverInterface
 {
     /**
@@ -23,7 +31,7 @@ class Resolver implements ResolverInterface
     protected $resolved = [];
 
     /**
-     * @param CacheInterface $cache
+     * @param array $definitions Definitions
      */
     public function __construct(array $definitions = [])
     {
@@ -32,18 +40,24 @@ class Resolver implements ResolverInterface
     }
 
     /**
+     * Sets the cache provider.
+     *
      * @param CacheInterface $cache
+     *
      * @return $this
      */
-    public function setCache(CacheInterface $cache)
+    public function useCache(CacheInterface $cache)
     {
         $this->cache = $cache;
         return $this;
     }
 
     /**
-     * @param string $fqcn
-     * @param DefinitionInterface $definition
+     * Binds the definition after constructor.
+     *
+     * @param string              $fqcn       Fully qualified class name
+     * @param DefinitionInterface $definition Definition
+     *
      * @return $this
      */
     public function bind(string $fqcn, DefinitionInterface $definition)
@@ -53,7 +67,10 @@ class Resolver implements ResolverInterface
     }
 
     /**
-     * @param string $fqcn
+     * Resolves and returns the instance of the class.
+     *
+     * @param string $fqcn Fully qualified class name
+     *
      * @return object
      */
     public function resolve(string $fqcn)
@@ -61,11 +78,11 @@ class Resolver implements ResolverInterface
         if (array_key_exists($fqcn, $this->definitions)) {
             $definition = $this->definitions[$fqcn];
         } else {
-            $definition = ClassDefinition::define($fqcn);
+            $definition = Definition\ClassDefinition::define($fqcn);
         }
 
         if (!array_key_exists($fqcn, $this->resolved)) {
-            $this->resolved[$fqcn] = $definition->resolve($this);
+            $this->resolved[$fqcn] = $definition->resolve($this, $this->cache);
         }
 
         return $this->resolved[$fqcn];

@@ -5,7 +5,10 @@ namespace Acelot\Resolver;
 interface ResolverInterface
 {
     /**
-     * @param string $fqcn
+     * Resolves class by given class name.
+     *
+     * @param string $fqcn Fully qualified class name
+     *
      * @return mixed
      */
     public function resolve(string $fqcn);
