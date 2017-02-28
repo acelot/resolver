@@ -8,7 +8,7 @@ use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class ClassDefinition implements DefinitionInterface
+class FactoryDefinition implements DefinitionInterface
 {
     use ArgumentsTrait;
 
@@ -18,23 +18,31 @@ class ClassDefinition implements DefinitionInterface
     protected $fqcn;
 
     /**
-     * Creates the definition with given class name.
-     *
-     * @param string $fqcn Fully qualified class name
-     *
-     * @return ClassDefinition
+     * @var null|string
      */
-    public static function define(string $fqcn): ClassDefinition
+    protected $method;
+
+    /**
+     * Creates the definition with given class name and factory method.
+     *
+     * @param string $fqcn   Fully qualified class name
+     * @param string $method Factory method
+     *
+     * @return FactoryDefinition
+     */
+    public static function define(string $fqcn, string $method = '__invoke'): FactoryDefinition
     {
-        return new ClassDefinition($fqcn);
+        return new FactoryDefinition($fqcn, $method);
     }
 
     /**
-     * @param string $fqcn Fully qualified class name
+     * @param string $fqcn   Fully qualified class name
+     * @param string $method Factory method
      */
-    private function __construct(string $fqcn)
+    private function __construct(string $fqcn, string $method)
     {
         $this->fqcn = $fqcn;
+        $this->method = $method;
     }
 
     /**
@@ -64,9 +72,13 @@ class ClassDefinition implements DefinitionInterface
             throw new ResolverException(sprintf('The class "%s" does not exists', $this->getFqcn()));
         }
 
-        $factoryMethod = $ref->getConstructor();
-        if ($factoryMethod === null) {
-            return $ref->newInstance();
+        try {
+            $factoryMethod = $ref->getMethod($this->method);
+        } catch (\ReflectionException $e) {
+            throw new ResolverException(sprintf(
+                'The factory method "%s" does not exists in the class',
+                $this->method
+            ));
         }
 
         $args = [];
@@ -93,6 +105,6 @@ class ClassDefinition implements DefinitionInterface
             );
         }
 
-        return $ref->newInstanceArgs($args);
+        return call_user_func_array([$this->getFqcn(), $factoryMethod], $args);
     }
 }

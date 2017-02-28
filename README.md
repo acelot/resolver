@@ -14,7 +14,7 @@ composer require acelot/resolver
 
 ### But Reflection is too slow for production?
 
-**Resolver** can use any [PSR-16](http://www.php-fig.org/psr/psr-16/) compatible cache providers through `useCache(CacheInterface $cache)` method. For example, [matthiasmullie/scrapbook](https://github.com/matthiasmullie/scrapbook):
+**Resolver** can use any [PSR-16](http://www.php-fig.org/psr/psr-16/) compatible cache provider through `useCache(CacheInterface $cache)` method. For example, [matthiasmullie/scrapbook](https://github.com/matthiasmullie/scrapbook):
 
 ```php
 $client = new \Memcached();
@@ -27,7 +27,8 @@ $resolver->useCache($cache);
 
 ### Available definitions
 
-- CallbackDefinition
+- ClosureDefinition
+- FactoryDefinition
 - ClassDefinition
 - ValueDefinition
 
@@ -140,7 +141,7 @@ use Psr\Log\LoggerInterface;
 
 $definitions = [
     Config::class =>
-        CallbackDefinition::define(function () {
+        ClosureDefinition::define(function () {
             return new Config([
                 'logger.channel' => 'acme_channel',
                 'mongodb.uri' => 'mongodb://localhost/mydb'
@@ -148,10 +149,10 @@ $definitions = [
         }),
 
     LoggerInterface::class => 
-        ClassDefinition::define(LoggerFactory::class)->withFactoryMethod('create'),
+        FactoryDefinition::define(LoggerFactory::class, 'create'),
         
     Database::class =>
-        ClassDefinition::define(MongoDbFactory::class)->withFactoryMethod('create')
+        FactoryDefinition::define(MongoDbFactory::class, 'create')
 ];
 
 $resolver = new Resolver($definitions);

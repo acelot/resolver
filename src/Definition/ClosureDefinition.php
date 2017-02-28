@@ -6,57 +6,49 @@ use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
+use Psr\SimpleCache\CacheInterface;
 
-class CallbackDefinition implements DefinitionInterface
+class ClosureDefinition implements DefinitionInterface
 {
     use ArgumentsTrait;
 
     /**
-     * @var string
+     * @var \Closure
      */
-    protected $callback;
+    protected $closure;
 
     /**
-     * Creates the definition with given callback function.
+     * Creates the definition with given closure function.
      *
-     * @param callable $callback Callback function
+     * @param \Closure $closure Closure function
      *
-     * @return CallbackDefinition
+     * @return ClosureDefinition
      */
-    public static function define(callable $callback): CallbackDefinition
+    public static function define(\Closure $closure): ClosureDefinition
     {
-        return new CallbackDefinition($callback);
+        return new ClosureDefinition($closure);
     }
 
     /**
-     * @param callable $callback Callback function
+     * @param \Closure $closure Closure function
      */
-    private function __construct(callable $callback)
+    private function __construct(\Closure $closure)
     {
-        $this->callback = $callback;
+        $this->closure = $closure;
     }
 
     /**
-     * Returns the callback function.
-     *
-     * @return callable Callback function
-     */
-    public function getCallback(): callable
-    {
-        return $this->callback;
-    }
-
-    /**
-     * Resolves and invoke the callback function.
+     * Resolves and invoke the closure function.
      *
      * @param ResolverInterface $resolver
+     * @param CacheInterface    $cache
      *
      * @return object
      * @throws ResolverException
      */
-    public function resolve(ResolverInterface $resolver)
+    public function resolve(ResolverInterface $resolver, CacheInterface $cache)
     {
-        $ref = new \ReflectionFunction($this->getCallback());
+        $ref = new \ReflectionFunction($this->closure);
         $args = [];
 
         foreach ($ref->getParameters() as $param) {
@@ -76,7 +68,7 @@ class CallbackDefinition implements DefinitionInterface
                 continue;
             }
 
-            throw new ResolverException(sprintf('Cannot resolve the callback "%s"', $ref->getName()));
+            throw new ResolverException(sprintf('Cannot resolve the closure function "%s"', $ref->getName()));
         }
 
         return $ref->invokeArgs($args);

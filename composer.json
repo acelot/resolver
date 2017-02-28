@@ -23,6 +23,11 @@
             "Acelot\\Resolver\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Acelot\\Resolver\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "test": "./vendor/bin/phpunit"
     }

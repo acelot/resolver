@@ -31,11 +31,14 @@ class Resolver implements ResolverInterface
     protected $resolved = [];
 
     /**
-     * @param array $definitions Definitions
+     * @param array $definitionsMapping Definitions mapping
      */
-    public function __construct(array $definitions = [])
+    public function __construct(array $definitionsMapping = [])
     {
-        $this->definitions = $definitions;
+        foreach ($definitionsMapping as $fqcn => $definition) {
+            $this->bind($fqcn, $definition);
+        }
+
         $this->resolved[ResolverInterface::class] = $this;
     }
 
@@ -53,7 +56,7 @@ class Resolver implements ResolverInterface
     }
 
     /**
-     * Binds the definition after constructor.
+     * Binds the class name to definition.
      *
      * @param string              $fqcn       Fully qualified class name
      * @param DefinitionInterface $definition Definition
