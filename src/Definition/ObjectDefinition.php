@@ -6,7 +6,7 @@ use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\ResolverInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class ValueDefinition implements DefinitionInterface
+class ObjectDefinition implements DefinitionInterface
 {
     /**
      * @var object
@@ -18,12 +18,12 @@ class ValueDefinition implements DefinitionInterface
      *
      * @param object $value Object value
      *
-     * @return ValueDefinition
+     * @return ObjectDefinition
      * @throws \InvalidArgumentException
      */
-    public static function define($value): ValueDefinition
+    public static function define($value): ObjectDefinition
     {
-        return new ValueDefinition($value);
+        return new ObjectDefinition($value);
     }
 
     /**

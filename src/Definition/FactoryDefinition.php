@@ -2,6 +2,7 @@
 
 namespace Acelot\Resolver\Definition;
 
+use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
@@ -46,16 +47,6 @@ class FactoryDefinition implements DefinitionInterface
     }
 
     /**
-     * Returns the fully qualified class name.
-     *
-     * @return string
-     */
-    public function getFqcn(): string
-    {
-        return $this->fqcn;
-    }
-
-    /**
      * Resolves and returns the instance of the class.
      *
      * @param ResolverInterface $resolver
@@ -66,45 +57,37 @@ class FactoryDefinition implements DefinitionInterface
      */
     public function resolve(ResolverInterface $resolver, CacheInterface $cache)
     {
-        try {
-            $ref = new \ReflectionClass($this->getFqcn());
-        } catch (\ReflectionException $e) {
-            throw new ResolverException(sprintf('The class "%s" does not exists', $this->getFqcn()));
+        if (!class_exists($this->fqcn)) {
+            throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
         }
 
-        try {
-            $factoryMethod = $ref->getMethod($this->method);
-        } catch (\ReflectionException $e) {
-            throw new ResolverException(sprintf(
-                'The factory method "%s" does not exists in the class',
-                $this->method
-            ));
+        $key = self::class . ':' . $this->fqcn . ':' . $this->method;
+
+        $fromCache = $cache->get($key);
+        if ($fromCache === null) {
+            try {
+                $factoryMethod = new \ReflectionMethod($this->fqcn, $this->method);
+            } catch (\ReflectionException $e) {
+                throw new ResolverException(sprintf(
+                    'The factory method "%s" does not exists in the class "%s"',
+                    $this->method,
+                    $this->fqcn
+                ));
+            }
+
+            if (!$factoryMethod->isStatic()) {
+                throw new ResolverException(sprintf('The factory method "%s" must be static', $this->method));
+            }
+
+            $functionMeta = FunctionMeta::fromReflection($factoryMethod);
+
+            $cache->set($key, serialize($functionMeta), 24 * 60 * 60);
+        } else {
+            $functionMeta = unserialize($fromCache);
         }
 
-        $args = [];
+        $args = iterator_to_array($this->resolveParameters($functionMeta, $resolver));
 
-        foreach ($factoryMethod->getParameters() as $param) {
-            if ($this->hasArgument($param->getName())) {
-                $args[] = $this->getArgument($param->getName());
-                continue;
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $args[] = $param->getDefaultValue();
-                continue;
-            }
-
-            $paramClass = $param->getClass();
-            if ($paramClass !== null) {
-                $args[] = $resolver->resolve($paramClass->getName());
-                continue;
-            }
-
-            throw new ResolverException(
-                sprintf('Cannot resolve the class "%s"', $ref->getName())
-            );
-        }
-
-        return call_user_func_array([$this->getFqcn(), $factoryMethod], $args);
+        return call_user_func_array([$this->fqcn, $this->method], $args);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Acelot\Resolver\Definition;
 
+use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
@@ -38,16 +39,6 @@ class ClassDefinition implements DefinitionInterface
     }
 
     /**
-     * Returns the fully qualified class name.
-     *
-     * @return string
-     */
-    public function getFqcn(): string
-    {
-        return $this->fqcn;
-    }
-
-    /**
      * Resolves and returns the instance of the class.
      *
      * @param ResolverInterface $resolver
@@ -58,41 +49,28 @@ class ClassDefinition implements DefinitionInterface
      */
     public function resolve(ResolverInterface $resolver, CacheInterface $cache)
     {
-        try {
-            $ref = new \ReflectionClass($this->getFqcn());
-        } catch (\ReflectionException $e) {
-            throw new ResolverException(sprintf('The class "%s" does not exists', $this->getFqcn()));
+        if (!class_exists($this->fqcn)) {
+            throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
         }
 
-        $factoryMethod = $ref->getConstructor();
-        if ($factoryMethod === null) {
-            return $ref->newInstance();
+        $key = self::class . ':' . $this->fqcn;
+
+        $fromCache = $cache->get($key);
+        if ($fromCache === null) {
+            try {
+                $factoryMethod = new \ReflectionMethod($this->fqcn, '__construct');
+                $functionMeta = FunctionMeta::fromReflection($factoryMethod);
+            } catch (\ReflectionException $e) {
+                $functionMeta = new FunctionMeta([]);
+            }
+
+            $cache->set($key, serialize($functionMeta), 24 * 60 * 60);
+        } else {
+            $functionMeta = unserialize($fromCache);
         }
 
-        $args = [];
+        $args = iterator_to_array($this->resolveParameters($functionMeta, $resolver));
 
-        foreach ($factoryMethod->getParameters() as $param) {
-            if ($this->hasArgument($param->getName())) {
-                $args[] = $this->getArgument($param->getName());
-                continue;
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $args[] = $param->getDefaultValue();
-                continue;
-            }
-
-            $paramClass = $param->getClass();
-            if ($paramClass !== null) {
-                $args[] = $resolver->resolve($paramClass->getName());
-                continue;
-            }
-
-            throw new ResolverException(
-                sprintf('Cannot resolve the class "%s"', $ref->getName())
-            );
-        }
-
-        return $ref->newInstanceArgs($args);
+        return new $this->fqcn(...$args);
     }
 }

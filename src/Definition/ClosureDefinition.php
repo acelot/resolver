@@ -2,6 +2,7 @@
 
 namespace Acelot\Resolver\Definition;
 
+use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
@@ -48,29 +49,19 @@ class ClosureDefinition implements DefinitionInterface
      */
     public function resolve(ResolverInterface $resolver, CacheInterface $cache)
     {
-        $ref = new \ReflectionFunction($this->closure);
-        $args = [];
+        $key = self::class . ':' . md5(serialize($this->closure));
 
-        foreach ($ref->getParameters() as $param) {
-            if ($this->hasArgument($param->getName())) {
-                $args[] = $this->getArgument($param->getName());
-                continue;
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $args[] = $param->getDefaultValue();
-                continue;
-            }
-
-            $paramClass = $param->getClass();
-            if ($paramClass !== null) {
-                $args[] = $resolver->resolve($paramClass->getName());
-                continue;
-            }
-
-            throw new ResolverException(sprintf('Cannot resolve the closure function "%s"', $ref->getName()));
+        $fromCache = $cache->get($key);
+        if ($fromCache === null) {
+            $ref = new \ReflectionFunction($this->closure);
+            $functionMeta = FunctionMeta::fromReflection($ref);
+            $cache->set($key, serialize($functionMeta), 24 * 60 * 60);
+        } else {
+            $functionMeta = unserialize($fromCache);
         }
 
-        return $ref->invokeArgs($args);
+        $args = iterator_to_array($this->resolveParameters($functionMeta, $resolver));
+
+        return call_user_func_array($this->closure, $args);
     }
 }

@@ -9,8 +9,8 @@ interface DefinitionInterface
     /**
      * Resolves the definition.
      *
-     * @param ResolverInterface $resolver
-     * @param CacheInterface    $cache
+     * @param ResolverInterface   $resolver
+     * @param CacheInterface $cache
      *
      * @return object
      */
