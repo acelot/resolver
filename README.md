@@ -1,5 +1,7 @@
 # Resolver
 
+[![Build Status](https://travis-ci.org/acelot/resolver.svg?branch=master)](https://travis-ci.org/acelot/resolver)
+
 **Resolver** is a dependency auto resolver for PHP 7.
 
 ### Installation
