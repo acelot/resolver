@@ -8,31 +8,102 @@
 composer require acelot/resolver
 ```
 
-### How it works?
+### Why?
 
-**Resolver** resolves the classes by using [Reflection](http://php.net/manual/ru/book.reflection.php). Through reflection the **Resolver** finds out all dependencies of the class and all dependencies of dependencies and so on. When **Resolver** reaches the deepest dependency it starts creating instances of these one by one until the top class. The resolved classes are stored in local array to avoid re-resolving.
-
-### But Reflection is too slow for production?
-
-**Resolver** can use any [PSR-16](http://www.php-fig.org/psr/psr-16/) compatible cache provider through `useCache(CacheInterface $cache)` method. For example, [matthiasmullie/scrapbook](https://github.com/matthiasmullie/scrapbook):
+Imagine a controller:
 
 ```php
-$client = new \Memcached();
-$client->addServer('localhost', 11211);
-$cache = new \MatthiasMullie\Scrapbook\Adapters\Memcached($client);
-
-$resolver = new Resolver();
-$resolver->useCache($cache);
+class UsersController
+{
+    public function __construct(UsersService $service)
+    {
+        // ...
+    }
+}
 ```
+
+As you can see the controller requires `UsersService` in constructor. To resolve this dependency you can simply pass
+the new instance of `UsersService`. Let's do this:
+
+```php
+$service = new UsersService();
+$controller = new UsersController($service);
+```
+
+But it doesn't work, because `UsersService`, in turn, requires `UsersRepository` to access the data.
+
+```php
+class UsersService
+{
+    public function __construct(UsersRepository $repository)
+    {
+        // ...
+    }
+}
+```
+
+Okay, let's create the repository instance!
+
+```php
+$repository = new UsersRepository();
+$service = new UsersService($repository);
+$controller = new UsersController($service);
+```
+
+Sadly, it still doesn't work, because we encountering the new dependency! The repository, surprisingly, requires 
+a database connection :)
+
+```php
+class UsersRepository
+{
+    public function __construct(Database $db)
+    {
+        // ...
+    }
+}
+```
+
+You say "Eat this!".
+
+```php
+$db = new Database('connection string here');
+$repository = new UsersRepository($db);
+$service = new UsersService($repository);
+$controller = new UsersController($service);
+```
+
+Success! We finally create the instance of `UsersController`!
+
+**Too. Many. Words. For. This. Simple. Shit!**
+
+In what turns this code using **Resolver**:
+
+```php
+$resolver = new Resolver([
+    Database::class => ClassDefinition::define(Database::class)->withArgument('connectionString', 'connection string here')
+]);
+
+$controller = $resolver->resolve(UsersController::class);
+```
+
+And it's all.
+
+
+### How it works?
+
+**Resolver** resolves the classes by using [Reflection](http://php.net/manual/ru/book.reflection.php).
+Through reflection the **Resolver** finds out all dependencies of the class and all dependencies of 
+dependencies and so on. When **Resolver** reaches the deepest dependency it starts creating instances 
+of these one by one until the top class. The resolved classes are stored in local array to avoid re-resolving.
 
 ### Available definitions
 
 - ClosureDefinition
 - FactoryDefinition
 - ClassDefinition
-- ValueDefinition
+- ObjectDefinition
 
-### Example
+### Detailed example
 
 **Logger Factory** `LoggerFactory.php`
 

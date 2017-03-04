@@ -4,7 +4,6 @@ namespace Acelot\Resolver\Definition;
 
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\ResolverInterface;
-use Psr\SimpleCache\CacheInterface;
 
 class ObjectDefinition implements DefinitionInterface
 {
@@ -44,11 +43,10 @@ class ObjectDefinition implements DefinitionInterface
      * Resolves the definition. Simply returns the value.
      *
      * @param ResolverInterface $resolver
-     * @param CacheInterface    $cache
      *
      * @return object
      */
-    public function resolve(ResolverInterface $resolver, CacheInterface $cache)
+    public function resolve(ResolverInterface $resolver)
     {
         return $this->value;
     }

@@ -2,7 +2,6 @@
 
 namespace Acelot\Resolver\Definition\Traits;
 
-use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
 
@@ -61,32 +60,33 @@ trait ArgumentsTrait
     /**
      * Resolves function parameters of the given function meta information.
      *
-     * @param FunctionMeta      $parameters
-     * @param ResolverInterface $resolver
+     * @param \ReflectionParameter[] $parameters
+     * @param ResolverInterface      $resolver
      *
      * @return \Iterator
+     * @throws ResolverException
      */
-    protected function resolveParameters(FunctionMeta $functionMeta, ResolverInterface $resolver): \Iterator
+    protected function resolveParameters($parameters, ResolverInterface $resolver): \Iterator
     {
-        foreach ($functionMeta->getParameters() as $param) {
+        foreach ($parameters as $param) {
             if ($this->hasArgument($param->getName())) {
                 yield $this->getArgument($param->getName());
                 continue;
             }
 
-            if ($param->hasDefaultValue()) {
+            if ($param->isDefaultValueAvailable()) {
                 yield $param->getDefaultValue();
                 continue;
             }
 
-            $paramClass = $param->getClassName();
+            $paramClass = $param->getClass();
             if ($paramClass !== null) {
-                yield $resolver->resolve($paramClass);
+                yield $resolver->resolve($paramClass->getName());
                 continue;
             }
 
             throw new ResolverException(sprintf(
-                'Cannot resolve the function because parameter "%s" require unknown value',
+                'Cannot resolve the function because parameter "%s" requires unknown value',
                 $this->fqcn,
                 $param->getName()
             ));

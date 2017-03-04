@@ -2,12 +2,10 @@
 
 namespace Acelot\Resolver\Definition;
 
-use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
-use Psr\SimpleCache\CacheInterface;
 
 class ClassDefinition implements DefinitionInterface
 {
@@ -42,34 +40,23 @@ class ClassDefinition implements DefinitionInterface
      * Resolves and returns the instance of the class.
      *
      * @param ResolverInterface $resolver
-     * @param CacheInterface    $cache
      *
      * @return object
      * @throws ResolverException
      */
-    public function resolve(ResolverInterface $resolver, CacheInterface $cache)
+    public function resolve(ResolverInterface $resolver)
     {
         if (!class_exists($this->fqcn)) {
             throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
         }
 
-        $key = self::class . ':' . $this->fqcn;
-
-        $fromCache = $cache->get($key);
-        if ($fromCache === null) {
-            try {
-                $factoryMethod = new \ReflectionMethod($this->fqcn, '__construct');
-                $functionMeta = FunctionMeta::fromReflection($factoryMethod);
-            } catch (\ReflectionException $e) {
-                $functionMeta = new FunctionMeta([]);
-            }
-
-            $cache->set($key, serialize($functionMeta), 24 * 60 * 60);
-        } else {
-            $functionMeta = unserialize($fromCache);
+        try {
+            $ref = new \ReflectionMethod($this->fqcn, '__construct');
+        } catch (\ReflectionException $e) {
+            return new $this->fqcn();
         }
 
-        $args = iterator_to_array($this->resolveParameters($functionMeta, $resolver));
+        $args = $this->resolveParameters($ref->getParameters(), $resolver);
 
         return new $this->fqcn(...$args);
     }

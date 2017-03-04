@@ -2,7 +2,6 @@
 
 namespace Acelot\Resolver;
 
-use Acelot\Resolver\Cache\NullCache;
 use Acelot\Resolver\Definition\ClassDefinition;
 use Psr\SimpleCache\CacheInterface;
 
@@ -10,7 +9,7 @@ use Psr\SimpleCache\CacheInterface;
  * @example
  *
  *   $resolver = new Resolver([
- *       LoggerInterface::class => ClassDefinition::define(MonologLoggerFactory::class),
+ *       LoggerInterface::class => ClassDefinition::define(LoggerFactory::class),
  *       Database::class => ClassDefinition::define(MongoDbFactory::class)
  *   ]);
  *
@@ -42,8 +41,6 @@ class Resolver implements ResolverInterface
         }
 
         $this->resolved[ResolverInterface::class] = $this;
-
-        $this->cache = new NullCache();
     }
 
     /**
@@ -57,19 +54,6 @@ class Resolver implements ResolverInterface
     public function bind(string $fqcn, DefinitionInterface $definition)
     {
         $this->definitions[$fqcn] = $definition;
-        return $this;
-    }
-
-    /**
-     * Sets the cache provider.
-     *
-     * @param CacheInterface $cache
-     *
-     * @return $this
-     */
-    public function useCache(CacheInterface $cache)
-    {
-        $this->cache = $cache;
         return $this;
     }
 
@@ -92,7 +76,7 @@ class Resolver implements ResolverInterface
             $definition = ClassDefinition::define($fqcn);
         }
 
-        $this->resolved[$fqcn] = $definition->resolve($this, $this->cache);
+        $this->resolved[$fqcn] = $definition->resolve($this);
 
         return $this->resolved[$fqcn];
     }

@@ -6,9 +6,8 @@ use PHPUnit\Framework\TestCase;
 
 class ResolverTest extends TestCase
 {
-    public function bindTest()
+    public function testDoNothing()
     {
-        $resolver = new Resolver();
-        $resolver->bind()
+        self::assertTrue(true);
     }
 }

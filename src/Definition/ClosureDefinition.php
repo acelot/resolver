@@ -2,12 +2,10 @@
 
 namespace Acelot\Resolver\Definition;
 
-use Acelot\Resolver\Definition\Meta\FunctionMeta;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
-use Psr\SimpleCache\CacheInterface;
 
 class ClosureDefinition implements DefinitionInterface
 {
@@ -42,26 +40,15 @@ class ClosureDefinition implements DefinitionInterface
      * Resolves and invoke the closure function.
      *
      * @param ResolverInterface $resolver
-     * @param CacheInterface    $cache
      *
      * @return object
      * @throws ResolverException
      */
-    public function resolve(ResolverInterface $resolver, CacheInterface $cache)
+    public function resolve(ResolverInterface $resolver)
     {
-        $key = self::class . ':' . md5(serialize($this->closure));
+        $ref = new \ReflectionFunction($this->closure);
+        $args = $this->resolveParameters($ref->getParameters(), $resolver);
 
-        $fromCache = $cache->get($key);
-        if ($fromCache === null) {
-            $ref = new \ReflectionFunction($this->closure);
-            $functionMeta = FunctionMeta::fromReflection($ref);
-            $cache->set($key, serialize($functionMeta), 24 * 60 * 60);
-        } else {
-            $functionMeta = unserialize($fromCache);
-        }
-
-        $args = iterator_to_array($this->resolveParameters($functionMeta, $resolver));
-
-        return call_user_func_array($this->closure, $args);
+        return call_user_func($this->closure, ...$args);
     }
 }

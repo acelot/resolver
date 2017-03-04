@@ -2,17 +2,14 @@
 
 namespace Acelot\Resolver;
 
-use Psr\SimpleCache\CacheInterface;
-
 interface DefinitionInterface
 {
     /**
      * Resolves the definition.
      *
-     * @param ResolverInterface   $resolver
-     * @param CacheInterface $cache
+     * @param ResolverInterface $resolver
      *
      * @return object
      */
-    public function resolve(ResolverInterface $resolver, CacheInterface $cache);
+    public function resolve(ResolverInterface $resolver);
 }
