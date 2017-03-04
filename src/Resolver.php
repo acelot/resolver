@@ -2,6 +2,8 @@
 
 namespace Acelot\Resolver;
 
+use Acelot\Resolver\Cache\NullCache;
+use Acelot\Resolver\Definition\ClassDefinition;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -87,7 +89,7 @@ class Resolver implements ResolverInterface
         if (array_key_exists($fqcn, $this->definitions)) {
             $definition = $this->definitions[$fqcn];
         } else {
-            $definition = Definition\ClassDefinition::define($fqcn);
+            $definition = ClassDefinition::define($fqcn);
         }
 
         $this->resolved[$fqcn] = $definition->resolve($this, $this->cache);
