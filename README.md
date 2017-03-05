@@ -12,7 +12,7 @@ composer require acelot/resolver
 
 ### Why?
 
-Imagine a controller:
+Imagine that you have a controller:
 
 ```php
 class UsersController
@@ -24,7 +24,7 @@ class UsersController
 }
 ```
 
-As you can see the controller requires `UsersService` in constructor. To resolve this dependency you can simply pass
+As you can see the controller requires `UsersService` in constructor. To resolve this dependency you can just pass
 the new instance of `UsersService`. Let's do this:
 
 ```php
@@ -32,7 +32,7 @@ $service = new UsersService();
 $controller = new UsersController($service);
 ```
 
-But it doesn't work, because `UsersService`, in turn, requires `UsersRepository` to access the data.
+It doesn't work, because `UsersService`, in turn, requires `UsersRepository` to access the data.
 
 ```php
 class UsersService
@@ -74,7 +74,7 @@ $service = new UsersService($repository);
 $controller = new UsersController($service);
 ```
 
-Success! We finally create the instance of `UsersController`!
+Success! We have finally created the instance of `UsersController`!
 
 **Too. Many. Words. For. This. Simple. Shit!**
 
