@@ -20,6 +20,7 @@ class DefinitionsTest extends TestCase
         $resolver = new Resolver();
         $resolver->bind(Config::class, ObjectDefinition::define($config));
 
+        /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
         self::assertInstanceOf(Config::class, $resolvedConfig);
@@ -33,6 +34,7 @@ class DefinitionsTest extends TestCase
             return new Config([]);
         }));
 
+        /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
         self::assertInstanceOf(Config::class, $resolvedConfig);
@@ -46,6 +48,7 @@ class DefinitionsTest extends TestCase
             ClassDefinition::define(Config::class)->withArgument('config', ['test' => 'ok'])
         );
 
+        /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
         self::assertInstanceOf(Config::class, $resolvedConfig);
@@ -60,9 +63,10 @@ class DefinitionsTest extends TestCase
             FactoryDefinition::define(ConfigFactory::class, 'create')
         );
 
+        /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
         self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertArrayHasKey('test', $resolvedConfig);
+        self::assertArrayHasKey('db.host', $resolvedConfig);
     }
 }

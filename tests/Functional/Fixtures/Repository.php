@@ -44,4 +44,9 @@ class Repository implements RepositoryInterface
     {
         $this->db->delete($id);
     }
+
+    public function getDb(): Database
+    {
+        return $this->db;
+    }
 }

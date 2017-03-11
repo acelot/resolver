@@ -23,4 +23,9 @@ class Service
 
         $this->repository->save($entity);
     }
+
+    public function getRepository(): RepositoryInterface
+    {
+        return $this->repository;
+    }
 }

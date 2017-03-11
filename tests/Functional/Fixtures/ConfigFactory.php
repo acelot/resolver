@@ -6,6 +6,9 @@ class ConfigFactory
 {
     public static function create()
     {
-        return new Config(['test' => 'ok']);
+        return new Config([
+            'db.host' => 'localhost',
+            'db.port' => 10000
+        ]);
     }
 }

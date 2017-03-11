@@ -1,6 +1,7 @@
 # Resolver
 
 [![Build Status](https://travis-ci.org/acelot/resolver.svg?branch=master)](https://travis-ci.org/acelot/resolver)
+[![Creative Commons Attribution 4.0 International](https://licensebuttons.net/l/by/4.0/80x15.png)](http://creativecommons.org/licenses/by/4.0/)
 
 **Resolver** is a dependency auto resolver for PHP 7.
 
@@ -75,9 +76,8 @@ $controller = new UsersController($service);
 ```
 
 Success! We have finally created the instance of `UsersController`!
-
-**Too. Many. Words. For. This. Simple. Shit!**
-
+Now imagine that you have ten or hundred controllers like this?!
+With **Resolver** you can greatly simplify creation of classes. 
 In what turns this code using **Resolver**:
 
 ```php
@@ -234,3 +234,13 @@ $resolver = new Resolver($definitions);
 $repository = $resolver->resolve(Repository::class);
 echo json_encode($respository->get(1));
 ```
+
+---
+
+**Resolver** (c) by Valeriy Protopopov.
+
+**Resolver** is licensed under a
+Creative Commons Attribution 4.0 International License.
+
+You should have received a copy of the license along with this
+work. If not, see <http://creativecommons.org/licenses/by/4.0/>.
