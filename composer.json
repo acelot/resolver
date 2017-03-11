@@ -29,5 +29,12 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
+    },
+    "archive": {
+        "exclude": [
+            "/.*",
+            "/phpunit.xml",
+            "/tests"
+        ]
     }
 }
