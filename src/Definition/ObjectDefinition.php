@@ -2,52 +2,62 @@
 
 namespace Acelot\Resolver\Definition;
 
+use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\DefinitionInterface;
+use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
 
 class ObjectDefinition implements DefinitionInterface
 {
-    /**
-     * @var object
-     */
-    protected $value;
+    use ArgumentsTrait;
 
     /**
-     * Creates the definition with given value.
+     * @var string
+     */
+    protected $fqcn;
+
+    /**
+     * Creates the definition with given class name.
      *
-     * @param object $value Object value
+     * @param string $fqcn Fully qualified class name
      *
      * @return ObjectDefinition
-     * @throws \InvalidArgumentException
      */
-    public static function define($value): ObjectDefinition
+    public static function define(string $fqcn): ObjectDefinition
     {
-        return new ObjectDefinition($value);
+        return new ObjectDefinition($fqcn);
     }
 
     /**
-     * @param object $value
-     *
-     * @throws \InvalidArgumentException
+     * @param string $fqcn Fully qualified class name
      */
-    private function __construct($value)
+    private function __construct(string $fqcn)
     {
-        if (!is_object($value)) {
-            throw new \InvalidArgumentException('Value must be an object');
-        }
-
-        $this->value = $value;
+        $this->fqcn = $fqcn;
     }
 
     /**
-     * Resolves the definition. Simply returns the value.
+     * Resolves and returns the instance of the class.
      *
      * @param ResolverInterface $resolver
      *
      * @return object
+     * @throws ResolverException
      */
     public function resolve(ResolverInterface $resolver)
     {
-        return $this->value;
+        if (!class_exists($this->fqcn)) {
+            throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
+        }
+
+        try {
+            $ref = new \ReflectionMethod($this->fqcn, '__construct');
+        } catch (\ReflectionException $e) {
+            return new $this->fqcn();
+        }
+
+        $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+        return new $this->fqcn(...$args);
     }
 }

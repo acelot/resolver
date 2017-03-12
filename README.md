@@ -82,7 +82,7 @@ In what turns this code using **Resolver**:
 
 ```php
 $resolver = new Resolver([
-    Database::class => ClassDefinition::define(Database::class)->withArgument('connectionString', 'connection string here')
+    Database::class => ObjectDefinition::define(Database::class)->withArgument('connectionString', 'connection string here')
 ]);
 
 $controller = $resolver->resolve(UsersController::class);
@@ -102,8 +102,8 @@ of these one by one until the top class. The resolved classes are stored in loca
 
 - ClosureDefinition
 - FactoryDefinition
-- ClassDefinition
 - ObjectDefinition
+- ValueDefinition
 
 ### Detailed example
 

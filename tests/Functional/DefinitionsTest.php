@@ -2,10 +2,10 @@
 
 namespace Acelot\Resolver\Tests\Functional;
 
-use Acelot\Resolver\Definition\ClassDefinition;
+use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Definition\ClosureDefinition;
 use Acelot\Resolver\Definition\FactoryDefinition;
-use Acelot\Resolver\Definition\ObjectDefinition;
+use Acelot\Resolver\Definition\ValueDefinition;
 use Acelot\Resolver\Resolver;
 use Acelot\Resolver\Tests\Functional\Fixtures\Config;
 use Acelot\Resolver\Tests\Functional\Fixtures\ConfigFactory;
@@ -13,12 +13,12 @@ use PHPUnit\Framework\TestCase;
 
 class DefinitionsTest extends TestCase
 {
-    public function testObjectDefinition()
+    public function testValueDefinition()
     {
         $config = new Config([]);
 
         $resolver = new Resolver();
-        $resolver->bind(Config::class, ObjectDefinition::define($config));
+        $resolver->bind(Config::class, ValueDefinition::define($config));
 
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
@@ -40,12 +40,12 @@ class DefinitionsTest extends TestCase
         self::assertInstanceOf(Config::class, $resolvedConfig);
     }
 
-    public function testClassDefinition()
+    public function testObjectDefinition()
     {
         $resolver = new Resolver();
         $resolver->bind(
             Config::class,
-            ClassDefinition::define(Config::class)->withArgument('config', ['test' => 'ok'])
+            ObjectDefinition::define(Config::class)->withArgument('config', ['test' => 'ok'])
         );
 
         /** @var Config $resolvedRepository */

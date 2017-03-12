@@ -2,7 +2,7 @@
 
 namespace Acelot\Resolver\Tests\Functional;
 
-use Acelot\Resolver\Definition\ClassDefinition;
+use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Resolver;
 use Acelot\Resolver\Tests\Functional\Fixtures\Config;
@@ -21,7 +21,7 @@ class ResolverTest extends TestCase
         $resolver = new Resolver();
         $resolver->bind(Config::class, FactoryDefinition::define(ConfigFactory::class, 'create'));
         $resolver->bind(Database::class, FactoryDefinition::define(DatabaseFactory::class, 'create'));
-        $resolver->bind(RepositoryInterface::class, ClassDefinition::define(Repository::class));
+        $resolver->bind(RepositoryInterface::class, ObjectDefinition::define(Repository::class));
 
         /** @var Service $resolvedService */
         $resolvedService = $resolver->resolve(Service::class);
