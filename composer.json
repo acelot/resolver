@@ -4,7 +4,7 @@
     "keywords": ["dependency-injection", "resolver", "inversion-of-control"],
     "type": "library",
     "homepage": "https://github.com/acelot/resolver",
-    "license": "MIT",
+    "license": "CC-BY-4.0",
     "authors": [
         {
             "name": "Valeriy Protopopov",
