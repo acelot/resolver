@@ -100,7 +100,6 @@ of these one by one until the top class. The resolved classes are stored in loca
 
 ### Available definitions
 
-- ClosureDefinition
 - FactoryDefinition
 - ObjectDefinition
 - ValueDefinition
@@ -214,7 +213,7 @@ use Psr\Log\LoggerInterface;
 
 $definitions = [
     Config::class =>
-        ClosureDefinition::define(function () {
+        FactoryDefinition::define(function () {
             return new Config([
                 'logger.channel' => 'acme_channel',
                 'mongodb.uri' => 'mongodb://localhost/mydb'
@@ -222,10 +221,10 @@ $definitions = [
         }),
 
     LoggerInterface::class => 
-        FactoryDefinition::define(LoggerFactory::class, 'create'),
+        FactoryDefinition::define([LoggerFactory::class, 'create']),
         
     Database::class =>
-        FactoryDefinition::define(MongoDbFactory::class, 'create')
+        FactoryDefinition::define([MongoDbFactory::class, 'create'])
 ];
 
 $resolver = new Resolver($definitions);

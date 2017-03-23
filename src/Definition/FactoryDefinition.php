@@ -11,41 +11,41 @@ class FactoryDefinition implements DefinitionInterface
 {
     use ArgumentsTrait;
 
-    /**
-     * @var string
-     */
-    protected $fqcn;
+    protected const TYPE_UNKNOWN = -1;
+    protected const TYPE_CLOSURE = 0;
+    protected const TYPE_OBJECT = 1;
+    protected const TYPE_ARRAY = 2;
+    protected const TYPE_ARRAY_OBJECT = 3;
+    protected const TYPE_STRING = 4;
+    protected const TYPE_STRING_SEPARATED = 5;
 
     /**
-     * @var null|string
+     * @var callable
      */
-    protected $method;
+    protected $callable;
 
     /**
-     * Creates the definition with given class name and factory method.
+     * Creates the definition with given callable.
      *
-     * @param string $fqcn   Fully qualified class name
-     * @param string $method Factory method
+     * @param callable $callable Callable
      *
      * @return FactoryDefinition
      */
-    public static function define(string $fqcn, string $method = '__invoke'): FactoryDefinition
+    public static function define(callable $callable): FactoryDefinition
     {
-        return new FactoryDefinition($fqcn, $method);
+        return new FactoryDefinition($callable);
     }
 
     /**
-     * @param string $fqcn   Fully qualified class name
-     * @param string $method Factory method
+     * @param callable $callable Callable
      */
-    private function __construct(string $fqcn, string $method)
+    public function __construct(callable $callable)
     {
-        $this->fqcn = $fqcn;
-        $this->method = $method;
+        $this->callable = $callable;
     }
 
     /**
-     * Resolves and returns the instance of the class.
+     * Resolves and invoke the callable.
      *
      * @param ResolverInterface $resolver
      *
@@ -54,26 +54,94 @@ class FactoryDefinition implements DefinitionInterface
      */
     public function resolve(ResolverInterface $resolver)
     {
-        if (!class_exists($this->fqcn)) {
-            throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
+        $type = $this->getCallableType();
+
+        switch ($type) {
+            case self::TYPE_CLOSURE:
+            case self::TYPE_STRING:
+                $ref = new \ReflectionFunction($this->callable);
+                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+                return call_user_func($this->callable, ...$args);
+
+            case self::TYPE_OBJECT:
+                $ref = new \ReflectionMethod($this->callable, '__invoke');
+                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+                return call_user_func($this->callable, ...$args);
+
+            case self::TYPE_ARRAY_OBJECT:
+                $ref = new \ReflectionMethod($this->callable[0], $this->callable[1]);
+                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+                return $ref->invoke($this->callable[0], ...$args);
+
+            case self::TYPE_ARRAY:
+                list($fqcn, $method) = $this->callable;
+                if ($method === '__construct') {
+                    throw new ResolverException('Use ObjectDefinition instead of FactoryDefinition');
+                }
+
+                $ref = new \ReflectionMethod($fqcn, $method);
+                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+                if ($ref->isStatic()) {
+                    return call_user_func($this->callable, ...$args);
+                }
+
+                return $ref->invoke($resolver->resolve($fqcn), ...$args);
+
+            case self::TYPE_STRING_SEPARATED:
+                list($fqcn, $method) = explode('::', $this->callable);
+                if ($method === '__construct') {
+                    throw new ResolverException('Use ObjectDefinition instead of FactoryDefinition');
+                }
+
+                $ref = new \ReflectionMethod($fqcn, $method);
+                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+
+                return call_user_func($this->callable, ...$args);
+
+            default:
+                throw new ResolverException('Unknown callable type');
+        }
+    }
+
+    /**
+     * @param callable $callable
+     *
+     * @return int
+     */
+    protected function getCallableType(): int
+    {
+        // Closure
+        if ($this->callable instanceof \Closure) {
+            return self::TYPE_CLOSURE;
         }
 
-        try {
-            $ref = new \ReflectionMethod($this->fqcn, $this->method);
-        } catch (\ReflectionException $e) {
-            throw new ResolverException(sprintf(
-                'The factory method "%s" does not exists in the class "%s"',
-                $this->method,
-                $this->fqcn
-            ));
+        // Object
+        if (is_object($this->callable)) {
+            return self::TYPE_OBJECT;
         }
 
-        if (!$ref->isStatic()) {
-            throw new ResolverException(sprintf('The factory method "%s" must be static', $this->method));
+        // Array
+        if (is_array($this->callable)) {
+            if (is_object($this->callable[0])) {
+                return self::TYPE_ARRAY_OBJECT;
+            }
+
+            return self::TYPE_ARRAY;
         }
 
-        $args = $this->resolveParameters($ref->getParameters(), $resolver);
+        // String
+        if (is_string($this->callable)) {
+            if (strpos($this->callable, '::') !== false) {
+                return self::TYPE_STRING_SEPARATED;
+            }
 
-        return call_user_func([$this->fqcn, $this->method], ...$args);
+            return self::TYPE_STRING;
+        }
+
+        return self::TYPE_UNKNOWN;
     }
 }

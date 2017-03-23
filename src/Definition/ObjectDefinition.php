@@ -31,7 +31,7 @@ class ObjectDefinition implements DefinitionInterface
     /**
      * @param string $fqcn Fully qualified class name
      */
-    private function __construct(string $fqcn)
+    public function __construct(string $fqcn)
     {
         $this->fqcn = $fqcn;
     }

@@ -30,7 +30,7 @@ class ValueDefinition implements DefinitionInterface
      *
      * @throws \InvalidArgumentException
      */
-    private function __construct($value)
+    public function __construct($value)
     {
         if (!is_object($value)) {
             throw new \InvalidArgumentException('Value must be an object');

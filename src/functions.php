@@ -2,20 +2,9 @@
 
 namespace Acelot\Resolver;
 
-use Acelot\Resolver\Definition\ClosureDefinition;
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Definition\ValueDefinition;
-
-/**
- * @param \Closure $closure
- *
- * @return ClosureDefinition
- */
-function closure(\Closure $closure): ClosureDefinition
-{
-    return ClosureDefinition::define($closure);
-}
 
 /**
  * @param string $fqcn
@@ -23,9 +12,9 @@ function closure(\Closure $closure): ClosureDefinition
  *
  * @return FactoryDefinition
  */
-function factory(string $fqcn, $method = '__invoke'): FactoryDefinition
+function factory(callable $callable): FactoryDefinition
 {
-    return FactoryDefinition::define($fqcn, $method);
+    return FactoryDefinition::define($callable);
 }
 
 /**

@@ -26,7 +26,8 @@
     "autoload-dev": {
         "psr-4": {
             "Acelot\\Resolver\\Tests\\": "tests/"
-        }
+        },
+        "files": ["src/tests/Functional/Fixtures/functions.php"]
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"

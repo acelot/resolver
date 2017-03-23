@@ -2,8 +2,8 @@
 
 namespace Acelot\Resolver;
 
+use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Definition\ObjectDefinition;
-use Psr\SimpleCache\CacheInterface;
 
 /**
  * @example
@@ -14,7 +14,7 @@ use Psr\SimpleCache\CacheInterface;
  *   ]);
  *
  */
-class Resolver implements ResolverInterface
+class Resolver implements ResolverInterface, InvokerInterface
 {
     /**
      * @var array
@@ -27,11 +27,6 @@ class Resolver implements ResolverInterface
     protected $resolved = [];
 
     /**
-     * @var CacheInterface
-     */
-    protected $cache;
-
-    /**
      * @param array $definitions Definitions mapping
      */
     public function __construct(array $definitions = [])
@@ -41,6 +36,7 @@ class Resolver implements ResolverInterface
         }
 
         $this->resolved[ResolverInterface::class] = $this;
+        $this->resolved[InvokerInterface::class] = $this;
     }
 
     /**
@@ -79,5 +75,20 @@ class Resolver implements ResolverInterface
         $this->resolved[$fqcn] = $definition->resolve($this);
 
         return $this->resolved[$fqcn];
+    }
+
+    /**
+     * Invoke a callable.
+     *
+     * @param callable $callable Callable
+     * @param array    $args     Arguments
+     *
+     * @return mixed
+     */
+    public function invoke(callable $callable, array $args = [])
+    {
+        return FactoryDefinition::define($callable)
+            ->withArguments($args)
+            ->resolve($this);
     }
 }

@@ -58,6 +58,21 @@ trait ArgumentsTrait
     }
 
     /**
+     * Returns the new instance of the trait holding class with new arguments.
+     *
+     * @param array $args Arguments
+     *
+     * @return static
+     */
+    public function withArguments(array $args)
+    {
+        $clone = clone $this;
+        $clone->args = $args;
+
+        return $clone;
+    }
+
+    /**
      * Resolves function parameters of the given function meta information.
      *
      * @param \ReflectionParameter[] $parameters

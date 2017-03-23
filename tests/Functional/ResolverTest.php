@@ -19,8 +19,8 @@ class ResolverTest extends TestCase
     public function testResolveClassWithNestedDependencies()
     {
         $resolver = new Resolver();
-        $resolver->bind(Config::class, FactoryDefinition::define(ConfigFactory::class, 'create'));
-        $resolver->bind(Database::class, FactoryDefinition::define(DatabaseFactory::class, 'create'));
+        $resolver->bind(Config::class, FactoryDefinition::define([ConfigFactory::class, 'create']));
+        $resolver->bind(Database::class, FactoryDefinition::define([DatabaseFactory::class, 'create']));
         $resolver->bind(RepositoryInterface::class, ObjectDefinition::define(Repository::class));
 
         /** @var Service $resolvedService */

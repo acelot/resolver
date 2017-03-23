@@ -11,4 +11,9 @@ class ConfigFactory
             'db.port' => 10000
         ]);
     }
+
+    public function __invoke()
+    {
+        return self::create();
+    }
 }
