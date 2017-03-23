@@ -11,24 +11,9 @@ use Acelot\Resolver\Tests\Functional\Fixtures\ConfigFactory;
 
 use PHPUnit\Framework\TestCase;
 
-class DefinitionsTest extends TestCase
+class FactoryDefinitionTest extends TestCase
 {
-    public function testValueDefinition()
-    {
-        $config = new Config([]);
-
-        $resolver = new Resolver([
-            Config::class => ValueDefinition::define($config)
-        ]);
-
-        /** @var Config $resolvedRepository */
-        $resolvedConfig = $resolver->resolve(Config::class);
-
-        self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertSame($config, $resolvedConfig);
-    }
-
-    public function testCallableDefinitionWithClosure()
+    public function testClosure()
     {
         $resolver = new Resolver([
             Config::class => FactoryDefinition::define(function () {
@@ -42,7 +27,7 @@ class DefinitionsTest extends TestCase
         self::assertInstanceOf(Config::class, $resolvedConfig);
     }
 
-    public function testCallableDefinitionWithArray1()
+    public function testArray()
     {
         $resolver = new Resolver([
             Config::class => FactoryDefinition::define([ConfigFactory::class, 'create'])
@@ -54,7 +39,7 @@ class DefinitionsTest extends TestCase
         self::assertInstanceOf(Config::class, $resolvedConfig);
     }
 
-    public function testCallableDefinitionWithArray2()
+    public function testArrayWithObject()
     {
         $factory = new ConfigFactory();
 
@@ -68,7 +53,7 @@ class DefinitionsTest extends TestCase
         self::assertInstanceOf(Config::class, $resolvedConfig);
     }
 
-    public function testCallableDefinitionWithObject()
+    public function testObject()
     {
         $factory = new ConfigFactory();
 
@@ -82,7 +67,7 @@ class DefinitionsTest extends TestCase
         self::assertInstanceOf(Config::class, $resolvedConfig);
     }
 
-    public function testCallableDefinitionWithString1()
+    public function testSeparatedString()
     {
         $resolver = new Resolver([
             Config::class => FactoryDefinition::define(
@@ -94,31 +79,5 @@ class DefinitionsTest extends TestCase
         $resolvedConfig = $resolver->resolve(Config::class);
 
         self::assertInstanceOf(Config::class, $resolvedConfig);
-    }
-
-    public function testObjectDefinition()
-    {
-        $resolver = new Resolver([
-            Config::class => ObjectDefinition::define(Config::class)->withArgument('config', ['test' => 'ok'])
-        ]);
-
-        /** @var Config $resolvedRepository */
-        $resolvedConfig = $resolver->resolve(Config::class);
-
-        self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertArrayHasKey('test', $resolvedConfig);
-    }
-
-    public function testFactoryDefinition()
-    {
-        $resolver = new Resolver([
-            Config::class => FactoryDefinition::define([ConfigFactory::class, 'create'])
-        ]);
-
-        /** @var Config $resolvedRepository */
-        $resolvedConfig = $resolver->resolve(Config::class);
-
-        self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertArrayHasKey('db.host', $resolvedConfig);
     }
 }

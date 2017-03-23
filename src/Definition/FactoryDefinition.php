@@ -108,7 +108,7 @@ class FactoryDefinition implements DefinitionInterface
     }
 
     /**
-     * @param callable $callable
+     * Returns the type of callable.
      *
      * @return int
      */

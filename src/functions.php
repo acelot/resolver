@@ -2,29 +2,28 @@
 
 namespace Acelot\Resolver;
 
-use Acelot\Resolver\Definition\FactoryDefinition;
-use Acelot\Resolver\Definition\ObjectDefinition;
-use Acelot\Resolver\Definition\ValueDefinition;
+use Acelot\Resolver\Definition\{
+    FactoryDefinition, ObjectDefinition, ValueDefinition
+};
 
 /**
- * @param string $fqcn
- * @param string $method
+ * @param callable $callable
  *
  * @return FactoryDefinition
  */
 function factory(callable $callable): FactoryDefinition
 {
-    return FactoryDefinition::define($callable);
+    return new FactoryDefinition($callable);
 }
 
 /**
  * @param string $fqcn
  *
- * @return ValueDefinition
+ * @return ObjectDefinition
  */
 function object(string $fqcn): ObjectDefinition
 {
-    return ObjectDefinition::define($fqcn);
+    return new ObjectDefinition($fqcn);
 }
 
 /**
@@ -34,5 +33,5 @@ function object(string $fqcn): ObjectDefinition
  */
 function value($value): ValueDefinition
 {
-    return ValueDefinition::define($value);
+    return new ValueDefinition($value);
 }
