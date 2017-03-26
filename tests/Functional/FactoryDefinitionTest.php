@@ -2,9 +2,7 @@
 
 namespace Acelot\Resolver\Tests\Functional;
 
-use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Definition\FactoryDefinition;
-use Acelot\Resolver\Definition\ValueDefinition;
 use Acelot\Resolver\Resolver;
 use Acelot\Resolver\Tests\Functional\Fixtures\Config;
 use Acelot\Resolver\Tests\Functional\Fixtures\ConfigFactory;
@@ -24,7 +22,7 @@ class FactoryDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
     }
 
     public function testArray()
@@ -36,7 +34,7 @@ class FactoryDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
     }
 
     public function testArrayWithObject()
@@ -50,7 +48,7 @@ class FactoryDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
     }
 
     public function testObject()
@@ -64,7 +62,7 @@ class FactoryDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
     }
 
     public function testSeparatedString()
@@ -78,6 +76,6 @@ class FactoryDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
     }
 }

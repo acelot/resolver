@@ -100,9 +100,9 @@ of these one by one until the top class. The resolved classes are stored in loca
 
 ### Available definitions
 
-- FactoryDefinition
-- ObjectDefinition
-- ValueDefinition
+- FactoryDefinition (short alias `factory()`)
+- ObjectDefinition (short alias `object()`)
+- ValueDefinition (short alias `value()`)
 
 ### Detailed example
 

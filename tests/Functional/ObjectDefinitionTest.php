@@ -19,7 +19,7 @@ class ObjectDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertArrayHasKey('test', $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertArrayHasKey('test', $resolvedConfig);
     }
 }

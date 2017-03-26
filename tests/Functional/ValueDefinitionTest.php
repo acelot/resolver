@@ -21,7 +21,7 @@ class ValueDefinitionTest extends TestCase
         /** @var Config $resolvedRepository */
         $resolvedConfig = $resolver->resolve(Config::class);
 
-        self::assertInstanceOf(Config::class, $resolvedConfig);
-        self::assertSame($config, $resolvedConfig);
+        $this->assertInstanceOf(Config::class, $resolvedConfig);
+        $this->assertSame($config, $resolvedConfig);
     }
 }

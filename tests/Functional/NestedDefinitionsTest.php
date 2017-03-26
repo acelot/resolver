@@ -23,14 +23,14 @@ class NestedDefinitionsTest extends TestCase
 
         /** @var Service $resolvedService */
         $resolvedService = $resolver->resolve(Service::class);
-        self::assertInstanceOf(Service::class, $resolvedService);
+        $this->assertInstanceOf(Service::class, $resolvedService);
 
         /** @var Repository $resolvedRepository */
         $resolvedRepository = $resolver->resolve(RepositoryInterface::class);
-        self::assertSame($resolvedService->getRepository(), $resolvedRepository);
+        $this->assertSame($resolvedService->getRepository(), $resolvedRepository);
 
         /** @var Database $resolvedDatabase */
         $resolvedDatabase = $resolver->resolve(Database::class);
-        self::assertSame($resolvedRepository->getDb(), $resolvedDatabase);
+        $this->assertSame($resolvedRepository->getDb(), $resolvedDatabase);
     }
 }
