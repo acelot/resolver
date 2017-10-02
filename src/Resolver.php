@@ -24,7 +24,7 @@ class Resolver implements ResolverInterface, InvokerInterface
     /**
      * @var array
      */
-    protected $resolved = [];
+    protected $shared = [];
 
     /**
      * @param array $definitions Definitions mapping
@@ -35,8 +35,8 @@ class Resolver implements ResolverInterface, InvokerInterface
             $this->bind($fqcn, $definition);
         }
 
-        $this->resolved[ResolverInterface::class] = $this;
-        $this->resolved[InvokerInterface::class] = $this;
+        $this->shared[ResolverInterface::class] = $this;
+        $this->shared[InvokerInterface::class] = $this;
     }
 
     /**
@@ -62,19 +62,27 @@ class Resolver implements ResolverInterface, InvokerInterface
      */
     public function resolve(string $fqcn)
     {
-        if (array_key_exists($fqcn, $this->resolved)) {
-            return $this->resolved[$fqcn];
+        // Search class in shared
+        if (array_key_exists($fqcn, $this->shared)) {
+            return $this->shared[$fqcn];
         }
 
+        // Search definition in predefined definition, otherwise use ObjectDefinition
         if (array_key_exists($fqcn, $this->definitions)) {
             $definition = $this->definitions[$fqcn];
         } else {
             $definition = ObjectDefinition::define($fqcn);
         }
 
-        $this->resolved[$fqcn] = $definition->resolve($this);
+        // Resolving
+        $result = $definition->resolve($this);
 
-        return $this->resolved[$fqcn];
+        // Sharing result between calls
+        if ($definition->isShared()) {
+            $this->shared[$fqcn] = $result;
+        }
+
+        return $result;
     }
 
     /**

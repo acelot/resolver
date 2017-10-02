@@ -3,12 +3,14 @@
 namespace Acelot\Resolver\Definition;
 
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
+use Acelot\Resolver\Definition\Traits\ShareTrait;
 use Acelot\Resolver\DefinitionInterface;
 use Acelot\Resolver\Exception\ResolverException;
 use Acelot\Resolver\ResolverInterface;
 
 class FactoryDefinition implements DefinitionInterface
 {
+    use ShareTrait;
     use ArgumentsTrait;
 
     protected const TYPE_UNKNOWN = -1;
@@ -42,6 +44,7 @@ class FactoryDefinition implements DefinitionInterface
     public function __construct(callable $callable)
     {
         $this->callable = $callable;
+        $this->isShared = true;
     }
 
     /**

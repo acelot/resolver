@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Acelot\Resolver\Definition;
 
@@ -37,6 +37,16 @@ class ValueDefinition implements DefinitionInterface
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * Is definition result must be shared between calls.
+     *
+     * @return bool
+     */
+    public function isShared(): bool
+    {
+        return true;
     }
 
     /**

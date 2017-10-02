@@ -27,7 +27,7 @@ class NestedDefinitionsTest extends TestCase
 
         /** @var Repository $resolvedRepository */
         $resolvedRepository = $resolver->resolve(RepositoryInterface::class);
-        $this->assertSame($resolvedService->getRepository(), $resolvedRepository);
+        $this->assertEquals($resolvedService->getRepository(), $resolvedRepository);
 
         /** @var Database $resolvedDatabase */
         $resolvedDatabase = $resolver->resolve(Database::class);
