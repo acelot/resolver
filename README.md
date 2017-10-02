@@ -105,6 +105,10 @@ of these one by one until the top class. The resolved classes are stored in loca
 - ObjectDefinition (short alias `object()`)
 - ValueDefinition (short alias `value()`)
 
+### Instance sharing
+
+Resolved definitions can be shared between calls via `->shared()` method. This method available in `FactoryDefinition` and `ObjectDefinition`. `ValueDefinition` is shared always by design.
+
 ---
 
 **Resolver** (c) by Valeriy Protopopov.
