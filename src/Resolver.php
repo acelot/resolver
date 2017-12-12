@@ -1,9 +1,10 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Acelot\Resolver;
 
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Definition\ObjectDefinition;
+use Acelot\Resolver\Exception\DefinitionException;
 
 /**
  * @example
@@ -17,7 +18,7 @@ use Acelot\Resolver\Definition\ObjectDefinition;
 class Resolver implements ResolverInterface, InvokerInterface
 {
     /**
-     * @var array
+     * @var array[string]DefinitionInterface
      */
     protected $definitions;
 
@@ -27,30 +28,70 @@ class Resolver implements ResolverInterface, InvokerInterface
     protected $shared = [];
 
     /**
-     * @param array $definitions Definitions mapping
+     * @param array[string]DefinitionInterface $definitions Definitions mapping
+     *
+     * @return Resolver
+     */
+    public static function create(array $definitions = []): Resolver
+    {
+        return new static($definitions);
+    }
+
+    /**
+     * @param array[string]DefinitionInterface $definitions Definitions mapping
      */
     public function __construct(array $definitions = [])
     {
         foreach ($definitions as $fqcn => $definition) {
-            $this->bind($fqcn, $definition);
+            if (!$definition instanceof DefinitionInterface) {
+                throw new \InvalidArgumentException(
+                    sprintf('Definition of "%s" must implement DefinitionInterface', $fqcn)
+                );
+            }
         }
 
+        $this->definitions = $definitions;
         $this->shared[ResolverInterface::class] = $this;
         $this->shared[InvokerInterface::class] = $this;
     }
 
     /**
-     * Binds the class name to definition.
+     * Returns all bound definitions.
+     *
+     * @return array[string]DefinitionInterface
+     */
+    public function getDefinitions(): array
+    {
+        return $this->definitions;
+    }
+
+    /**
+     * Binds the class name to definition. Immutable.
      *
      * @param string              $fqcn       Fully qualified class name
      * @param DefinitionInterface $definition Definition
      *
-     * @return $this
+     * @return Resolver
      */
-    public function bind(string $fqcn, DefinitionInterface $definition)
+    public function withDefinition(string $fqcn, DefinitionInterface $definition): Resolver
     {
-        $this->definitions[$fqcn] = $definition;
-        return $this;
+        $clone = clone $this;
+        $clone->definitions[$fqcn] = $definition;
+        return $clone;
+    }
+
+    /**
+     * Unbinds the definition by class name. Immutable.
+     *
+     * @param string $fqcn Fully qualified class name
+     *
+     * @return Resolver
+     */
+    public function withoutDefinition(string $fqcn): Resolver
+    {
+        $clone = clone $this;
+        unset($clone->definitions[$fqcn]);
+        return $clone;
     }
 
     /**
@@ -59,6 +100,7 @@ class Resolver implements ResolverInterface, InvokerInterface
      * @param string $fqcn Fully qualified class name
      *
      * @return object
+     * @throws DefinitionException
      */
     public function resolve(string $fqcn)
     {
@@ -92,6 +134,7 @@ class Resolver implements ResolverInterface, InvokerInterface
      * @param array    $args     Arguments
      *
      * @return mixed
+     * @throws Exception\ResolverException
      */
     public function invoke(callable $callable, array $args = [])
     {

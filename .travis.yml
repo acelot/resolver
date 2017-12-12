@@ -5,3 +5,7 @@ php:
 
 install:
   - composer install --no-interaction
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files

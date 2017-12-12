@@ -4,7 +4,7 @@ namespace Acelot\Resolver\Tests\Functional;
 
 use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Resolver;
-use Acelot\Resolver\Tests\Functional\Fixtures\Config;
+use Acelot\Resolver\Tests\Fixtures\Config;
 
 use PHPUnit\Framework\TestCase;
 

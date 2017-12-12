@@ -5,7 +5,7 @@ namespace Acelot\Resolver\Definition;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\Definition\Traits\ShareTrait;
 use Acelot\Resolver\DefinitionInterface;
-use Acelot\Resolver\Exception\ResolverException;
+use Acelot\Resolver\Exception\DefinitionException;
 use Acelot\Resolver\ResolverInterface;
 
 class ObjectDefinition implements DefinitionInterface
@@ -44,12 +44,12 @@ class ObjectDefinition implements DefinitionInterface
      * @param ResolverInterface $resolver
      *
      * @return object
-     * @throws ResolverException
+     * @throws DefinitionException
      */
     public function resolve(ResolverInterface $resolver)
     {
         if (!class_exists($this->fqcn)) {
-            throw new ResolverException(sprintf('The class "%s" does not exists', $this->fqcn));
+            throw new DefinitionException(sprintf('The class "%s" does not exists', $this->fqcn));
         }
 
         try {

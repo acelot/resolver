@@ -6,7 +6,7 @@ use Acelot\Resolver\Definition\{
     ObjectDefinition, FactoryDefinition
 };
 use Acelot\Resolver\Resolver;
-use Acelot\Resolver\Tests\Functional\Fixtures\{
+use Acelot\Resolver\Tests\Fixtures\{
     Config, ConfigFactory, Database, DatabaseFactory, Repository, RepositoryInterface, Service
 };
 use PHPUnit\Framework\TestCase;

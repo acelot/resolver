@@ -2,6 +2,8 @@
 
 namespace Acelot\Resolver;
 
+use Acelot\Resolver\Exception\DefinitionException;
+
 interface DefinitionInterface
 {
     /**
@@ -17,6 +19,7 @@ interface DefinitionInterface
      * @param ResolverInterface $resolver
      *
      * @return object
+     * @throws DefinitionException
      */
     public function resolve(ResolverInterface $resolver);
 }

@@ -5,7 +5,7 @@ namespace Acelot\Resolver\Tests\Functional;
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Resolver;
 
-use Acelot\Resolver\Tests\Functional\Fixtures\ValueHolder;
+use Acelot\Resolver\Tests\Fixtures\ValueHolder;
 use PHPUnit\Framework\TestCase;
 
 class ShareTest extends TestCase

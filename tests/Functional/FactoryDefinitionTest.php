@@ -4,8 +4,8 @@ namespace Acelot\Resolver\Tests\Functional;
 
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Resolver;
-use Acelot\Resolver\Tests\Functional\Fixtures\Config;
-use Acelot\Resolver\Tests\Functional\Fixtures\ConfigFactory;
+use Acelot\Resolver\Tests\Fixtures\Config;
+use Acelot\Resolver\Tests\Fixtures\ConfigFactory;
 
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +69,7 @@ class FactoryDefinitionTest extends TestCase
     {
         $resolver = new Resolver([
             Config::class => FactoryDefinition::define(
-                'Acelot\Resolver\Tests\Functional\Fixtures\ConfigFactory::create'
+                ConfigFactory::class . '::create'
             )
         ]);
 

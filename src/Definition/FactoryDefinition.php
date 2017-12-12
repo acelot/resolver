@@ -5,7 +5,7 @@ namespace Acelot\Resolver\Definition;
 use Acelot\Resolver\Definition\Traits\ArgumentsTrait;
 use Acelot\Resolver\Definition\Traits\ShareTrait;
 use Acelot\Resolver\DefinitionInterface;
-use Acelot\Resolver\Exception\ResolverException;
+use Acelot\Resolver\Exception\DefinitionException;
 use Acelot\Resolver\ResolverInterface;
 
 class FactoryDefinition implements DefinitionInterface
@@ -48,16 +48,37 @@ class FactoryDefinition implements DefinitionInterface
     }
 
     /**
+     * @return callable
+     */
+    public function getCallable(): callable
+    {
+        return $this->callable;
+    }
+
+    /**
+     * @param callable $callable
+     *
+     * @return FactoryDefinition
+     */
+    public function withCallable(callable $callable): FactoryDefinition
+    {
+        $clone = clone $this;
+        $clone->callable = $callable;
+
+        return $clone;
+    }
+
+    /**
      * Resolves and invoke the callable.
      *
      * @param ResolverInterface $resolver
      *
      * @return object
-     * @throws ResolverException
+     * @throws DefinitionException
      */
     public function resolve(ResolverInterface $resolver)
     {
-        $type = $this->getCallableType();
+        $type = self::getCallableType($this->callable);
 
         switch ($type) {
             case self::TYPE_CLOSURE:
@@ -82,7 +103,7 @@ class FactoryDefinition implements DefinitionInterface
             case self::TYPE_ARRAY:
                 list($fqcn, $method) = $this->callable;
                 if ($method === '__construct') {
-                    throw new ResolverException('Use ObjectDefinition instead of FactoryDefinition');
+                    throw new DefinitionException('Use ObjectDefinition instead of FactoryDefinition');
                 }
 
                 $ref = new \ReflectionMethod($fqcn, $method);
@@ -97,7 +118,7 @@ class FactoryDefinition implements DefinitionInterface
             case self::TYPE_STRING_SEPARATED:
                 list($fqcn, $method) = explode('::', $this->callable);
                 if ($method === '__construct') {
-                    throw new ResolverException('Use ObjectDefinition instead of FactoryDefinition');
+                    throw new DefinitionException('Use ObjectDefinition instead of FactoryDefinition');
                 }
 
                 $ref = new \ReflectionMethod($fqcn, $method);
@@ -106,30 +127,32 @@ class FactoryDefinition implements DefinitionInterface
                 return call_user_func($this->callable, ...$args);
 
             default:
-                throw new ResolverException('Unknown callable type');
+                throw new DefinitionException('Unknown callable type');
         }
     }
 
     /**
      * Returns the type of callable.
      *
+     * @param callable $callable
+     *
      * @return int
      */
-    protected function getCallableType(): int
+    protected static function getCallableType(callable $callable): int
     {
         // Closure
-        if ($this->callable instanceof \Closure) {
+        if ($callable instanceof \Closure) {
             return self::TYPE_CLOSURE;
         }
 
         // Object
-        if (is_object($this->callable)) {
+        if (is_object($callable)) {
             return self::TYPE_OBJECT;
         }
 
         // Array
-        if (is_array($this->callable)) {
-            if (is_object($this->callable[0])) {
+        if (is_array($callable)) {
+            if (is_object($callable[0])) {
                 return self::TYPE_ARRAY_OBJECT;
             }
 
@@ -137,8 +160,8 @@ class FactoryDefinition implements DefinitionInterface
         }
 
         // String
-        if (is_string($this->callable)) {
-            if (strpos($this->callable, '::') !== false) {
+        if (is_string($callable)) {
+            if (strpos($callable, '::') !== false) {
                 return self::TYPE_STRING_SEPARATED;
             }
 

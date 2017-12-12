@@ -2,7 +2,7 @@
 
 namespace Acelot\Resolver\Definition\Traits;
 
-use Acelot\Resolver\Exception\ResolverException;
+use Acelot\Resolver\Exception\DefinitionException;
 use Acelot\Resolver\ResolverInterface;
 
 trait ArgumentsTrait
@@ -58,6 +58,21 @@ trait ArgumentsTrait
     }
 
     /**
+     * Returns the new instance of the trait holding class without argument.
+     *
+     * @param string $name
+     *
+     * @return static
+     */
+    public function withoutArgument(string $name)
+    {
+        $clone = clone $this;
+        unset($clone->args[$name]);
+
+        return $clone;
+    }
+
+    /**
      * Returns the new instance of the trait holding class with new arguments.
      *
      * @param array $args Arguments
@@ -79,7 +94,7 @@ trait ArgumentsTrait
      * @param ResolverInterface      $resolver
      *
      * @return \Iterator
-     * @throws ResolverException
+     * @throws DefinitionException
      */
     protected function resolveParameters($parameters, ResolverInterface $resolver): \Iterator
     {
@@ -100,7 +115,7 @@ trait ArgumentsTrait
                 continue;
             }
 
-            throw new ResolverException(sprintf(
+            throw new DefinitionException(sprintf(
                 'Cannot resolve the function because parameter "%s" requires unknown value',
                 $this->fqcn,
                 $param->getName()

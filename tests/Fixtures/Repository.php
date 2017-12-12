@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Acelot\Resolver\Tests\Functional\Fixtures;
+namespace Acelot\Resolver\Tests\Fixtures;
 
 class Repository implements RepositoryInterface
 {
