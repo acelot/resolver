@@ -2,9 +2,11 @@
 
 namespace Acelot\Resolver\Exception;
 
+use Psr\Container\ContainerExceptionInterface;
+
 /**
  * The general exception thrown by Resolver.
  */
-class ResolverException extends \Exception
+class ResolverException extends \Exception implements ContainerExceptionInterface
 {
 }

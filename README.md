@@ -4,7 +4,7 @@
 ![](https://img.shields.io/badge/dependencies-zero-blue.svg)
 ![](https://img.shields.io/badge/license-MIT-green.svg)
 
-**Resolver** is a dependency auto resolver for PHP 7.
+**Resolver** is a dependency auto resolver for PHP 7. Supports PSR-11 `ContainerInterface`.
 
 ### Installation
 

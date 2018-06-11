@@ -5,6 +5,8 @@ namespace Acelot\Resolver;
 use Acelot\Resolver\Definition\FactoryDefinition;
 use Acelot\Resolver\Definition\ObjectDefinition;
 use Acelot\Resolver\Exception\DefinitionException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @example
@@ -15,7 +17,7 @@ use Acelot\Resolver\Exception\DefinitionException;
  *   ]);
  *
  */
-class Resolver implements ResolverInterface, InvokerInterface
+class Resolver implements ResolverInterface, InvokerInterface, ContainerInterface
 {
     /**
      * @var array[string]DefinitionInterface
@@ -68,7 +70,7 @@ class Resolver implements ResolverInterface, InvokerInterface
     /**
      * Binds the class name to definition. Immutable.
      *
-     * @param string              $fqcn       Fully qualified class name
+     * @param string              $fqcn Fully qualified class name
      * @param DefinitionInterface $definition Definition
      *
      * @return Resolver
@@ -131,7 +133,7 @@ class Resolver implements ResolverInterface, InvokerInterface
      * Invoke a callable.
      *
      * @param callable $callable Callable
-     * @param array    $args     Arguments
+     * @param array    $args Arguments
      *
      * @return mixed
      * @throws Exception\ResolverException
@@ -141,5 +143,26 @@ class Resolver implements ResolverInterface, InvokerInterface
         return FactoryDefinition::define($callable)
             ->withArguments($args)
             ->resolve($this);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return mixed|object
+     * @throws ContainerExceptionInterface
+     */
+    public function get($id)
+    {
+        return $this->resolve($id);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return bool
+     */
+    public function has($id)
+    {
+        return true;
     }
 }
