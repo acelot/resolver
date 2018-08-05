@@ -1,42 +1,41 @@
 {
-    "name": "acelot/resolver",
-    "description": "Dependency auto resolver for PHP 7",
-    "keywords": ["dependency-injection", "resolver", "inversion-of-control"],
-    "type": "library",
-    "homepage": "https://github.com/acelot/resolver",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Valeriy Protopopov",
-            "email": "provaleriy@gmail.com"
-        }
-    ],
-    "require": {
-        "php": "^7.1",
-        "psr/container": "^1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^6.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Acelot\\Resolver\\": "src/"
-        },
-        "files": ["src/functions.php"]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Acelot\\Resolver\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "./vendor/bin/phpunit"
-    },
-    "archive": {
-        "exclude": [
-            "/.*",
-            "/phpunit.xml",
-            "/tests"
-        ]
+  "name": "acelot/resolver",
+  "description": "Dependency auto resolver for PHP 7",
+  "keywords": [
+    "dependency-injection",
+    "resolver",
+    "inversion-of-control"
+  ],
+  "type": "library",
+  "homepage": "https://github.com/acelot/resolver",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Valeriy Protopopov",
+      "email": "provaleriy@gmail.com"
     }
+  ],
+  "require": {
+    "php": "^7.1",
+    "psr/container": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Acelot\\Resolver\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Acelot\\Resolver\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml"
+  }
 }

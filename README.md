@@ -1,6 +1,7 @@
 # Resolver
 
 [![Build Status](https://travis-ci.org/acelot/resolver.svg?branch=master)](https://travis-ci.org/acelot/resolver)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/acelot/resolver.svg)](https://codeclimate.com/github/acelot/resolver)
 ![](https://img.shields.io/badge/dependencies-zero-blue.svg)
 ![](https://img.shields.io/badge/license-MIT-green.svg)
 
