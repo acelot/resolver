@@ -53,6 +53,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
         }
 
         $this->definitions = $definitions;
+        $this->shared[ContainerInterface::class] = $this;
         $this->shared[ResolverInterface::class] = $this;
         $this->shared[InvokerInterface::class] = $this;
     }
