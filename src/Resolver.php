@@ -166,4 +166,24 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
     {
         return true;
     }
+
+    /**
+     * Removes the resolved object from shared items.
+     * This is useful when you want the object to be re-resolved.
+     *
+     * @param string $fqcn
+     */
+    public function unshare(string $fqcn): void
+    {
+        unset($this->shared[$fqcn]);
+    }
+
+    /**
+     * Clear all the resolved objects from shared items.
+     * @see `removeShared` method
+     */
+    public function unshareAll(): void
+    {
+        $this->shared = [];
+    }
 }

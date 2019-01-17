@@ -41,4 +41,21 @@ class ShareTest extends TestCase
 
         $this->assertNotSame($resolved1, $resolved2);
     }
+
+    public function testRemoveShared()
+    {
+        $resolver = new Resolver([
+            ValueHolder::class => FactoryDefinition::define(function () {
+                return new ValueHolder(microtime());
+            })->shared()
+        ]);
+
+        /** @var ValueHolder $resolvedRepository */
+        $resolved1 = $resolver->resolve(ValueHolder::class);
+        $resolver->unshare(ValueHolder::class);
+        usleep(100);
+        $resolved2 = $resolver->resolve(ValueHolder::class);
+
+        $this->assertNotSame($resolved1, $resolved2);
+    }
 }
