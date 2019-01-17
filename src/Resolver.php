@@ -19,6 +19,13 @@ use Psr\Container\ContainerInterface;
  */
 class Resolver implements ResolverInterface, InvokerInterface, ContainerInterface
 {
+    private const ALIASES = [
+        Resolver::class,
+        ContainerInterface::class,
+        ResolverInterface::class,
+        InvokerInterface::class,
+    ];
+
     /**
      * @var array[string]DefinitionInterface
      */
@@ -53,9 +60,6 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
         }
 
         $this->definitions = $definitions;
-        $this->shared[ContainerInterface::class] = $this;
-        $this->shared[ResolverInterface::class] = $this;
-        $this->shared[InvokerInterface::class] = $this;
     }
 
     /**
@@ -71,7 +75,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
     /**
      * Binds the class name to definition. Immutable.
      *
-     * @param string              $fqcn Fully qualified class name
+     * @param string              $fqcn       Fully qualified class name
      * @param DefinitionInterface $definition Definition
      *
      * @return Resolver
@@ -107,6 +111,11 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
      */
     public function resolve(string $fqcn)
     {
+        // Resolver aliases
+        if (in_array($fqcn, self::ALIASES)) {
+            return $this;
+        }
+
         // Search class in shared
         if (array_key_exists($fqcn, $this->shared)) {
             return $this->shared[$fqcn];
@@ -134,7 +143,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
      * Invoke a callable.
      *
      * @param callable $callable Callable
-     * @param array    $args Arguments
+     * @param array    $args     Arguments
      *
      * @return mixed
      * @throws Exception\ResolverException
