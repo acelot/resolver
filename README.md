@@ -5,7 +5,7 @@
 ![](https://img.shields.io/badge/dependencies-zero-blue.svg)
 ![](https://img.shields.io/badge/license-MIT-green.svg)
 
-**Resolver** is a dependency auto resolver for PHP 7. Supports PSR-11 `ContainerInterface`.
+**Resolver** is a dependency auto resolver for PHP 7/8. Supports PSR-11 `ContainerInterface`.
 
 ### Installation
 
@@ -55,7 +55,7 @@ $service = new UsersService($repository);
 $controller = new UsersController($service);
 ```
 
-Sadly, it still doesn't work, because we encountering the new dependency! The repository, surprisingly, requires 
+Sadly, it still doesn't work, because we encountering the new dependency! The repository, surprisingly, requires
 a database connection :)
 
 ```php
@@ -79,7 +79,7 @@ $controller = new UsersController($service);
 
 Success! We have finally created the instance of `UsersController`!
 Now imagine that you have ten or hundred controllers like this?!
-With **Resolver** you can greatly simplify creation of classes. 
+With **Resolver** you can greatly simplify creation of classes.
 In what turns this code using **Resolver**:
 
 ```php
@@ -96,8 +96,8 @@ And it's all.
 ### How it works?
 
 **Resolver** resolves the classes by using [Reflection](http://php.net/manual/ru/book.reflection.php).
-Through reflection the **Resolver** finds out all dependencies of the class and all dependencies of 
-dependencies and so on. When **Resolver** reaches the deepest dependency it starts creating instances 
+Through reflection the **Resolver** finds out all dependencies of the class and all dependencies of
+dependencies and so on. When **Resolver** reaches the deepest dependency it starts creating instances
 of these one by one until the top class. The resolved classes are stored in local array to avoid re-resolving.
 
 ### Available definitions
