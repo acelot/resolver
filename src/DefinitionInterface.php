@@ -18,7 +18,7 @@ interface DefinitionInterface
      *
      * @param ResolverInterface $resolver
      *
-     * @return object
+     * @return mixed
      * @throws DefinitionException
      */
     public function resolve(ResolverInterface $resolver);

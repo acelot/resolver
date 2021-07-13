@@ -9,7 +9,7 @@ interface ResolverInterface
      *
      * @param string $fqcn Fully qualified class name
      *
-     * @return mixed
+     * @return object
      */
     public function resolve(string $fqcn);
 }

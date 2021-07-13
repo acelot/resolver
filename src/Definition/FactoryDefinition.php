@@ -83,31 +83,46 @@ class FactoryDefinition implements DefinitionInterface
         switch ($type) {
             case self::TYPE_CLOSURE:
             case self::TYPE_STRING:
-                $ref = new \ReflectionFunction($this->callable);
-                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+                /** @var \Closure|callable-string $callable */
+                $callable = $this->callable;
+                $ref = new \ReflectionFunction($callable);
+                $args = iterator_to_array($this->resolveParameters($ref->getParameters(), $resolver));
 
                 return call_user_func($this->callable, ...$args);
 
             case self::TYPE_OBJECT:
-                $ref = new \ReflectionMethod($this->callable, '__invoke');
-                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+                /** @var object $callable */
+                $callable = $this->callable;
+                $ref = new \ReflectionMethod($callable, '__invoke');
+                $args = iterator_to_array($this->resolveParameters($ref->getParameters(), $resolver));
 
                 return call_user_func($this->callable, ...$args);
 
             case self::TYPE_ARRAY_OBJECT:
-                $ref = new \ReflectionMethod($this->callable[0], $this->callable[1]);
-                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+                /** @var array $callable */
+                $callable = $this->callable;
+                /** @var object $callableObject */
+                $callableObject = $callable[0];
+                /** @var string $callableMethod */
+                $callableMethod = $callable[1];
+                $ref = new \ReflectionMethod($callableObject, $callableMethod);
+                $args = iterator_to_array($this->resolveParameters($ref->getParameters(), $resolver));
 
-                return $ref->invoke($this->callable[0], ...$args);
+                return $ref->invoke($callableObject, ...$args);
 
             case self::TYPE_ARRAY:
-                list($fqcn, $method) = $this->callable;
+                /** @var array $callable */
+                $callable = $this->callable;
+                /** @var class-string $fqcn */
+                $fqcn = $callable[0];
+                /** @var string $method */
+                $method = $callable[1];
                 if ($method === '__construct') {
                     throw new DefinitionException('Use ObjectDefinition instead of FactoryDefinition');
                 }
 
                 $ref = new \ReflectionMethod($fqcn, $method);
-                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+                $args = iterator_to_array($this->resolveParameters($ref->getParameters(), $resolver));
 
                 if ($ref->isStatic()) {
                     return call_user_func($this->callable, ...$args);
@@ -116,13 +131,17 @@ class FactoryDefinition implements DefinitionInterface
                 return $ref->invoke($resolver->resolve($fqcn), ...$args);
 
             case self::TYPE_STRING_SEPARATED:
-                list($fqcn, $method) = explode('::', $this->callable);
+                /** @var string $callable */
+                $callable = $this->callable;
+
+                /** @var class-string $fqcn */
+                list($fqcn, $method) = explode('::', $callable);
                 if ($method === '__construct') {
                     throw new DefinitionException('Use ObjectDefinition instead of FactoryDefinition');
                 }
 
                 $ref = new \ReflectionMethod($fqcn, $method);
-                $args = $this->resolveParameters($ref->getParameters(), $resolver);
+                $args = iterator_to_array($this->resolveParameters($ref->getParameters(), $resolver));
 
                 return call_user_func($this->callable, ...$args);
 
@@ -137,6 +156,8 @@ class FactoryDefinition implements DefinitionInterface
      * @param callable $callable
      *
      * @return int
+     *
+     * @psalm-suppress RedundantCondition
      */
     protected static function getCallableType(callable $callable): int
     {
