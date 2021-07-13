@@ -109,7 +109,7 @@ trait ArgumentsTrait
                 continue;
             }
 
-            $paramClass = $param->getClass();
+            $paramClass = $param->getType();
             if ($paramClass !== null) {
                 yield $resolver->resolve($paramClass->getName());
                 continue;
