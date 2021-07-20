@@ -5,7 +5,8 @@ env:
 language: php
 
 php:
-  - '7.1'
+  - '7.3'
+  - '8.0'
 
 install:
   - composer install --no-interaction
@@ -21,6 +22,7 @@ before_script:
 
 script:
   - composer run test
+  - composer run psalm
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

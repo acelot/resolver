@@ -110,14 +110,13 @@ trait ArgumentsTrait
             }
 
             $paramClass = $param->getType();
-            if ($paramClass !== null) {
+            if ($paramClass instanceof \ReflectionNamedType) {
                 yield $resolver->resolve($paramClass->getName());
                 continue;
             }
 
             throw new DefinitionException(sprintf(
                 'Cannot resolve the function because parameter "%s" requires unknown value',
-                $this->fqcn,
                 $param->getName()
             ));
         }

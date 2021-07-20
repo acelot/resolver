@@ -15,7 +15,7 @@ class ValueDefinition implements DefinitionInterface
     /**
      * Creates the definition with given value.
      *
-     * @param object $value Object value
+     * @param object|mixed $value Object value
      *
      * @return ValueDefinition
      * @throws \InvalidArgumentException
@@ -26,7 +26,7 @@ class ValueDefinition implements DefinitionInterface
     }
 
     /**
-     * @param object $value
+     * @param object|mixed $value
      *
      * @throws \InvalidArgumentException
      */

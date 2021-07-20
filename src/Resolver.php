@@ -27,7 +27,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
     ];
 
     /**
-     * @var array[string]DefinitionInterface
+     * @var array<string, DefinitionInterface>
      */
     protected $definitions;
 
@@ -37,17 +37,17 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
     protected $shared = [];
 
     /**
-     * @param array[string]DefinitionInterface $definitions Definitions mapping
+     * @param array<string, DefinitionInterface|mixed> $definitions Definitions mapping
      *
      * @return Resolver
      */
     public static function create(array $definitions = []): Resolver
     {
-        return new static($definitions);
+        return new Resolver($definitions);
     }
 
     /**
-     * @param array[string]DefinitionInterface $definitions Definitions mapping
+     * @param array<string, DefinitionInterface|mixed> $definitions Definitions mapping
      */
     public function __construct(array $definitions = [])
     {
@@ -65,7 +65,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
     /**
      * Returns all bound definitions.
      *
-     * @return array[string]DefinitionInterface
+     * @return array<string, DefinitionInterface>
      */
     public function getDefinitions(): array
     {
@@ -159,9 +159,8 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
      * @param string $id
      *
      * @return mixed|object
-     * @throws ContainerExceptionInterface
      */
-    public function get($id)
+    public function get(string $id)
     {
         return $this->resolve($id);
     }
@@ -171,7 +170,7 @@ class Resolver implements ResolverInterface, InvokerInterface, ContainerInterfac
      *
      * @return bool
      */
-    public function has($id)
+    public function has(string $id)
     {
         return true;
     }
